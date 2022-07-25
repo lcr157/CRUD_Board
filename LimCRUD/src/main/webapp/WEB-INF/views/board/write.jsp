@@ -12,15 +12,35 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/vendor/bootstrap5/css/bootstrap.min.css" type="text/css">
 
 <script type="text/javascript">
-// 로그인
-function Login() {
-	const f = document.mainlogin;
+// 게시글 쓰기 및 수정
+function sendOk() {
+	const f = document.boardForm;
+	let mode = '${mode}';
+	let str;
 	
-	f.action = "${pageContext.request.contextPath}/member/login";
+	str = f.subject.value;
+	if(! str) {
+		alert("제목을 입력하세요");
+		f.subject.focus();
+		return;
+	}
+	
+	str = f.content.value;
+	if(! str) {
+		alert("내용을 입력하세요");
+		f.content.focus();
+		return;
+	}
+	
+	if(mode == 'update' && !confirm("게시글 수정하시겠습니까?") ){
+		return;
+	}
+	
+	f.action = "${pageContext.request.contextPath}/board/${mode}";
 	f.submit();
 }
 
-// 모달로그인
+// 로그인
 function sendModalLogin() {
 	const f = document.modalLoginForm;
 	
@@ -33,7 +53,9 @@ function loginWithKakao() {
 	location.href = "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=본일발급키&redirect_uri=본인발급주소";
 }
 </script>
+
 </head>
+
 
 <body>
 <!-- 헤더 -->
@@ -83,40 +105,55 @@ function loginWithKakao() {
 
 
 <!-- 메인단 -->
-<div class="contentBody container col-11 my-5 mt-5" style="padding-top: 30px;">
-	<div class="modal-dialog">
-		<div class="modal-content rounded-5 shadow">
-			<div class="p-5 pb-4 border-bottom-0">
-				<h2 class="fw-bold mb-0 login-brand">LimCRUD</h2>
-			</div>
-			<div class="p-5 pt-0">
-				<form name="mainlogin" action="" method="post">
-				<div class="form-floating mb-3">
-					<input type="email" class="form-control rounded-4" id="floatingInput" name="UserId">
-					<label for="floatingInput">아이디</label>
-				</div>
-				<div class="form-floating mb-3">
-					<input type="password" class="form-control rounded-4" id="floatingPassword" name="UserPwd">
-					<label for="floatingPassword">비밀번호</label>
-				</div>
-				<button class="w-100 mb-2 btn btn-lg rounded-4" type="button" style="background-color:#87CE00; color:#fff; font-weight:600;" onclick="Login();">로그인</button>
-				<hr class="mt-3">
-				<small class="fw-bold mb-3 text-secondary text-center">간편 로그인</small>
-				<div>&nbsp;</div>
-				<button class="w-100 py-2 mb-2 btn btn-outline-warning rounded-4" type="button">
-					Sign up with Kakao
-				</button>
-				<button class="w-100 py-2 mb-2 btn btn-outline-danger rounded-4" type="button">
-					Sign up with google
-				</button>
-				<button class="w-100 py-2 mb-2 btn btn-outline-success rounded-4" type="button">
-					Sign up with naver
-				</button>
+<main class="flex-shrink-0">
+	<div class="container" style="padding-top: 30px; max-width: 800px;">
+		<h2 style="padding-top: 10px; padding-bottom: 10px;"> 게시판</h2>			
+			<div class="body-main">
+				<form name="boardForm" method="post">
+					<table class="table mt-3 write-form">
+						<tr>
+							<td class="table-light col-sm-2" scope="row">제 목</td>
+							<td>
+								<input type="text" name="subject" class="form-control" value="${dto.subject}">
+							</td>
+						</tr>
+	        
+						<tr>
+							<td class="table-light col-sm-2" scope="row">작성자명</td>
+	 						<td>
+								<p class="form-control-plaintext">${sessionScope.member.userName}</p>
+							</td>
+						</tr>
+
+						<tr>
+							<td class="table-light col-sm-2" scope="row">내 용</td>
+							<td>
+								<textarea name="content" id="content" class="form-control" style="min-height: 300px;">${dto.content}</textarea>
+							</td>
+						</tr>
+					</table>
+					
+					<table class="table table-borderless">
+	 					<tr>
+							<td class="text-center">
+								<button type="button" class="btn btn-dark" onclick="sendOk();">${mode=='update'?'수정완료':'등록하기'}&nbsp;<i class="bi bi-check2"></i></button>
+								<button type="reset" class="btn btn-light">다시입력</button>
+								<button type="button" class="btn btn-light" onclick="location.href='${pageContext.request.contextPath}/board/main';">${mode=='update'?'수정취소':'등록취소'}&nbsp;<i class="bi bi-x"></i></button>
+								<input type="hidden" name="UserId" value="${sessionScope.member.userId}">
+								<input type="hidden" name="UserName" value="${sessionScope.member.userName}">
+								
+								<c:if test="${mode == 'update'}">
+									<input type="hidden" name="num" value="${dto.num}">
+									<input type="hidden" name="page" value="${page}">
+								</c:if>
+							</td>
+						</tr>
+					</table>
 				</form>
+			
 			</div>
 		</div>
-	</div>
-</div>	 
+</main>
 
 
 <!-- 푸터 -->
@@ -159,6 +196,5 @@ function loginWithKakao() {
 		</div>
 	</div>
 </div>
-
 
 </body> </html>

@@ -12,48 +12,51 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 @Entity
-@Table(name= "bbs")
+@Table(name="board")
 public class Board implements Serializable  {
 	private static final long serialVersionUID = 1L;
 	
 	@Id
-	@Column(name = "BoardNum", columnDefinition = "NUMBER")
-	@SequenceGenerator(name = "bbs_num_generator", sequenceName = "bbs_seq", allocationSize = 1)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "bbs_num_generator")
-	private int BoardNum; 			// pk이자 시퀀스로 만듬
+	@Column(name = "num", columnDefinition = "NUMBER")
+	@SequenceGenerator(name = "board_seq", sequenceName = "board_seq", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "board_seq")
+	private long num; 			// pk이자 시퀀스로 만듬
 	
 	@Column(name= "UserId", nullable = false)
 	private String UserId;
 	
-	@Column(name= "subject", nullable = false, length = 500)
-	private String subject;
+	@Column(name= "UserName")
+	private String UserName;
 	
-	@Column(name= "content", nullable = false, length = 4000)
-	private String content;
+	@Column(name= "Subject", nullable = false, length = 500)
+	private String Subject;
+	
+	@Column(name= "Content", nullable = false, length = 4000)
+	private String Content;
 	
 	@Column(nullable = false, columnDefinition = "DATE DEFAULT SYSDATE", updatable = false)
-	private String reg_date;
+	private String RegDate;
 	
-	@Column(name="hitCount", nullable = false, columnDefinition = "NUMBER DEFATUL 0",
+	@Column(name="HitCount", nullable = false, columnDefinition = "NUMBER DEFAULT 0",
 			insertable = false, updatable = false)
-	private int hitCount;
+	private int HitCount;
 	
 	
 	// insert전에 호출되는 어노테이션 -> 
 	@PrePersist
 	public void prePersist() {
-		this.reg_date = this.reg_date == null ?
-				new java.sql.Date(new java.util.Date().getTime()).toString() : this.reg_date;
+		this.RegDate = this.RegDate == null ?
+				new java.sql.Date(new java.util.Date().getTime()).toString() : this.RegDate;
 	}
 
 
-	public int getBoardNum() {
-		return BoardNum;
+	public long getNum() {
+		return num;
 	}
 
 
-	public void setBoardNum(int boardNum) {
-		BoardNum = boardNum;
+	public void setNum(long num) {
+		this.num = num;
 	}
 
 
@@ -68,42 +71,52 @@ public class Board implements Serializable  {
 
 
 	public String getSubject() {
-		return subject;
+		return Subject;
 	}
 
 
 	public void setSubject(String subject) {
-		this.subject = subject;
+		Subject = subject;
 	}
 
 
 	public String getContent() {
-		return content;
+		return Content;
 	}
 
 
 	public void setContent(String content) {
-		this.content = content;
+		Content = content;
 	}
 
 
-	public String getReg_date() {
-		return reg_date;
+	public String getRegDate() {
+		return RegDate;
 	}
 
 
-	public void setReg_date(String reg_date) {
-		this.reg_date = reg_date;
+	public void setRegDate(String regDate) {
+		RegDate = regDate;
 	}
 
 
 	public int getHitCount() {
-		return hitCount;
+		return HitCount;
 	}
 
 
 	public void setHitCount(int hitCount) {
-		this.hitCount = hitCount;
+		HitCount = hitCount;
+	}
+
+
+	public String getUserName() {
+		return UserName;
+	}
+
+
+	public void setUserName(String userName) {
+		UserName = userName;
 	}
 
 }

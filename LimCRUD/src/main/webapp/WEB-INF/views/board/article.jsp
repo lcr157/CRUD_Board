@@ -9,18 +9,20 @@
 <title>LimCRUD</title>
 <link rel="icon" href="data:;base64,iVBORw0KGgo=">
 <script type="text/javascript" src="${pageContext.request.contextPath}/resources/vendor/bootstrap5/js/bootstrap.bundle.min.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/paginate.js"></script>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/vendor/bootstrap5/css/bootstrap.min.css" type="text/css">
 
+
 <script type="text/javascript">
-// 로그인
-function Login() {
-	const f = document.mainlogin;
+function deleteBoard() {
+	if( !confirm("게시글 삭제하시겠습니까?")) {
+		return false;		
+	}
 	
-	f.action = "${pageContext.request.contextPath}/member/login";
-	f.submit();
+	location.href = "${pageContext.request.contextPath}/board/delete?num=${dto.num}";
 }
 
-// 모달로그인
+//로그인
 function sendModalLogin() {
 	const f = document.modalLoginForm;
 	
@@ -33,7 +35,9 @@ function loginWithKakao() {
 	location.href = "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=본일발급키&redirect_uri=본인발급주소";
 }
 </script>
+
 </head>
+
 
 <body>
 <!-- 헤더 -->
@@ -83,40 +87,63 @@ function loginWithKakao() {
 
 
 <!-- 메인단 -->
-<div class="contentBody container col-11 my-5 mt-5" style="padding-top: 30px;">
-	<div class="modal-dialog">
-		<div class="modal-content rounded-5 shadow">
-			<div class="p-5 pb-4 border-bottom-0">
-				<h2 class="fw-bold mb-0 login-brand">LimCRUD</h2>
-			</div>
-			<div class="p-5 pt-0">
-				<form name="mainlogin" action="" method="post">
-				<div class="form-floating mb-3">
-					<input type="email" class="form-control rounded-4" id="floatingInput" name="UserId">
-					<label for="floatingInput">아이디</label>
-				</div>
-				<div class="form-floating mb-3">
-					<input type="password" class="form-control rounded-4" id="floatingPassword" name="UserPwd">
-					<label for="floatingPassword">비밀번호</label>
-				</div>
-				<button class="w-100 mb-2 btn btn-lg rounded-4" type="button" style="background-color:#87CE00; color:#fff; font-weight:600;" onclick="Login();">로그인</button>
-				<hr class="mt-3">
-				<small class="fw-bold mb-3 text-secondary text-center">간편 로그인</small>
-				<div>&nbsp;</div>
-				<button class="w-100 py-2 mb-2 btn btn-outline-warning rounded-4" type="button">
-					Sign up with Kakao
-				</button>
-				<button class="w-100 py-2 mb-2 btn btn-outline-danger rounded-4" type="button">
-					Sign up with google
-				</button>
-				<button class="w-100 py-2 mb-2 btn btn-outline-success rounded-4" type="button">
-					Sign up with naver
-				</button>
-				</form>
-			</div>
+<main class="flex-shrink-0">
+	<div class="container" style="padding-top: 30px; max-width: 800px;">
+		<h2 style="padding-top: 10px; padding-bottom: 10px;"> 게시판</h2>			
+			<div class="body-main">
+					<table class="table mt-3 write-form">
+						<tr>
+							<td colspan="2" align="center">
+								${dto.subject}
+							</td>
+						</tr>
+					
+						<tr>
+							<td width="50%">
+								이름 : ${dto.userName}
+							</td>
+							<td align="right">
+								${dto.regDate} | 조회 ${dto.hitCount}
+							</td>
+						</tr>
+						
+						<tr>
+							<td colspan="2" valign="top" height="200">
+								${dto.content}
+							</td>
+						</tr>
+				
+					<tr>
+						<td width="50%">
+							<c:choose>
+								<c:when test="${sessionScope.member.userId == dto.userId}">
+									<!-- 게시글 작성자로 로그인 -> 수정, 삭제 둘다 가능 -->
+									<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/board/update?num=${dto.num}&page=${page}';">수정</button>
+									<button type="button" class="btn" onclick="deleteBoard();">삭제</button>
+								</c:when>
+								
+								<c:when test="${sessionScope.member.userRole == 1}">
+									<!-- 관리자로 로그인 -> 수정 불가능, 삭제 가능 -->
+									<button type="button" disabled="disabled" class="btn" onclick="location.href='${pageContext.request.contextPath}/board/update?num=${dto.num}&page=${page}';">수정</button>
+									<button type="button" class="btn" onclick="deleteBoard();">삭제</button>
+								</c:when>
+								
+								<c:otherwise>
+									<!-- 비로그인 -> 수정, 삭제 불가능 -->
+									<button type="button" disabled="disabled" class="btn" onclick="location.href='${pageContext.request.contextPath}/board/update?num=${dto.num}&page=${page}';">수정</button>
+									<button type="button" disabled="disabled" class="btn" onclick="deleteBoard();">삭제</button>
+								</c:otherwise>
+							</c:choose>
+						</td>
+						<td align="right">
+							<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/board/main?${query}';">리스트</button>
+						</td>
+					</tr>
+				</table>
+			
 		</div>
 	</div>
-</div>	 
+</main>
 
 
 <!-- 푸터 -->
@@ -160,5 +187,5 @@ function loginWithKakao() {
 	</div>
 </div>
 
-
-</body> </html>
+</body>
+</html>
